@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>Fin-Buddy | Student Expense Tracker</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- React & ReactDOM (UMD) -->
+    <script src="https://unpkg.com/react@18.2.0/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
+    <!-- Babel Standalone -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        * {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        
+        body {
+            background: radial-gradient(circle at 10% 30%, #121826, #0A0F16);
+            min-height: 100vh;
+            padding: 1rem;
+            margin: 0;
+        }
+        
+        /* Glassmorphism core */
+        .glass-card {
+            background: rgba(20, 28, 38, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            border-radius: 2rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3), 0 0 0 0.5px rgba(0, 242, 255, 0.1) inset;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 242, 255, 0.3) inset;
+        }
+        
+        /* custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #1E2A36;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #00F2FF;
+            border-radius: 10px;
+        }
+        
+        /* slide-in animation */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(24px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .slide-item {
+            animation: slideIn 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
+        }
+        
+        /* progress bar transition */
+        .progress-fill {
+            transition: width 0.5s ease-out;
+        }
+        
+        /* chart bars transition */
+        .chart-bar {
+            transition: height 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+        
+        /* custom input focus ring */
+        input:focus, button:focus {
+            outline: none;
+        }
+        
+        input:focus {
+            box-shadow: 0 0 0 2px rgba(0, 242, 255, 0.4);
+            border-color: #00F2FF !important;
+        }
+        
+        button:active {
+            transform: scale(0.97);
+        }
+        
+        /* responsive touch */
+        @media (max-width: 640px) {
+            body {
+                padding: 0.75rem;
+            }
+            .glass-card {
+                border-radius: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // ----------------------------- HELPER FUNCTIONS ---------------------------------
+        // Smart Categorization + Icon mapping based on keywords
+        const getCategoryAndIcon = (description) => {
+            const lowerDesc = description.toLowerCase();
+            if (lowerDesc.includes('chai') || lowerDesc.includes('coffee') || lowerDesc.includes('tea') || lowerDesc.includes('cafe')) 
+                return { category: 'Food', icon: '☕' };
+            if (lowerDesc.includes('auto') || lowerDesc.includes('taxi') || lowerDesc.includes('ola') || lowerDesc.includes('uber') || lowerDesc.includes('bus') || lowerDesc.includes('metro'))
+                return { category: 'Transport', icon: '🚗' };
+            if (lowerDesc.includes('book') || lowerDesc.includes('notebook') || lowerDesc.includes('stationery') || lowerDesc.includes('pen') || lowerDesc.includes('library'))
+                return { category: 'Academic', icon: '📚' };
+            if (lowerDesc.includes('movie') || lowerDesc.includes('game') || lowerDesc.includes('party') || lowerDesc.includes('netflix') || lowerDesc.includes('spotify'))
+                return { category: 'Fun', icon: '🎉' };
+            // default fallback
+            if (lowerDesc.includes('food') || lowerDesc.includes('lunch') || lowerDesc.includes('dinner') || lowerDesc.includes('snack')) 
+                return { category: 'Food', icon: '🍔' };
+            if (lowerDesc.includes('petrol') || lowerDesc.includes('fuel')) 
+                return { category: 'Transport', icon: '⛽' };
+            return { category: 'Fun', icon: '✨' };
+        };
+
+        // Hinglish funny tips based on spend amount
+        const getFinBuddyTip = (lastAmount, totalSpentToday) => {
+            const tips = [
+                "💸 Bhai, itna kharcha? Kal se canteen band! 🏦",
+                "📉 Tuze lagta hai paisa udta hai? Budget bana le yaar!",
+                "🤑 Chai ke 10 rupaye bachake crorepati banja!",
+                "⚡ Leaky bucket? Chhoti chhoti kharcha se bach, champion ban!",
+                "🎓 Books liya? Smart investment, but samose pe control 🙏",
+                "🚗 Auto wale bhai ko mana kar, walk kar, fit aur rich!",
+                "🍕 Pizza ya books? Choose wisely, Fin-Buddy dekh raha hai!",
+                "📉 Daily burn rate dekh? Teri savings ro rahi hai 😭",
+                "⭐ Tip: 50₹ se neeche ka expense is 'Leaky Bucket' — tu leak seal kar!"
+            ];
+            if (lastAmount > 100) return "🚨 Bade bhai, ₹100+ uda diya? " + tips[0];
+            if (lastAmount > 50) return "⚠️ Thoda sahen kar, ₹50 bachta toh aaj mast treat! " + tips[2];
+            if (totalSpentToday > 300) return "🔥 Aggressive kharcha! Fin-Buddy bolta hai: 'Kal se tiffin laana' 🍱";
+            return tips[Math.floor(Math.random() * tips.length)];
+        };
+
+        // Helper to get category totals from transactions
+        const getCategoryTotals = (transactions) => {
+            const map = { Food: 0, Transport: 0, Academic: 0, Fun: 0 };
+            transactions.forEach(t => {
+                if (map[t.category] !== undefined) map[t.category] += t.amount;
+                else map.Fun += t.amount;
+            });
+            return map;
+        };
+
+        // ----------------------------- MAIN COMPONENT ------------------------------------
+        const FinBuddyApp = () => {
+            const [transactions, setTransactions] = React.useState([]);
+            const [description, setDescription] = React.useState("");
+            const [amount, setAmount] = React.useState("");
+            const [dailyBudget, setDailyBudget] = React.useState(500);
+            const [feedbackMsg, setFeedbackMsg] = React.useState("✨ Fin-Buddy: Add expense, get smart tips!");
+            
+            const totalSpent = transactions.reduce((sum, t) => sum + t.amount, 0);
+            const remainingBudget = dailyBudget - totalSpent;
+            const budgetUsedPercent = Math.min(100, Math.max(0, (totalSpent / dailyBudget) * 100));
+            const leakyBucketCount = transactions.filter(t => t.amount < 50).length;
+            
+            const categoryTotals = getCategoryTotals(transactions);
+            const maxCategoryVal = Math.max(1, ...Object.values(categoryTotals));
+            
+            const addTransaction = (e) => {
+                e.preventDefault();
+                if (!description.trim()) {
+                    setFeedbackMsg("⚠️ Bhai, kya khareeda? Description daal!");
+                    return;
+                }
+                const amtNum = parseFloat(amount);
+                if (isNaN(amtNum) || amtNum <= 0) {
+                    setFeedbackMsg("💰 Sahi amount daal (₹ positive number)");
+                    return;
+                }
+                
+                const { category, icon } = getCategoryAndIcon(description);
+                const newTx = {
+                    id: Date.now(),
+                    description: description.trim(),
+                    amount: amtNum,
+                    category: category,
+                    icon: icon,
+                    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' })
+                };
+                
+                setTransactions(prev => [newTx, ...prev]);
+                setDescription("");
+                setAmount("");
+                
+                const newTotal = totalSpent + amtNum;
+                const tip = getFinBuddyTip(amtNum, newTotal);
+                setFeedbackMsg(`💬 ${tip}`);
+                
+                setTimeout(() => {
+                    setFeedbackMsg(prev => prev === `💬 ${tip}` ? "✨ Fin-Buddy: Keep tracking, champion!" : prev);
+                }, 4500);
+            };
+            
+            const deleteTransaction = (id) => {
+                setTransactions(prev => prev.filter(t => t.id !== id));
+                setFeedbackMsg("🗑️ Expense hata diya! Ab budget thoda relax 😎");
+                setTimeout(() => setFeedbackMsg(prev => prev.includes("relax") ? "✨ Fin-Buddy: Add more expenses to analyse!" : prev), 2500);
+            };
+            
+            const handleBudgetChange = (e) => {
+                let val = parseInt(e.target.value);
+                if (isNaN(val)) val = 500;
+                if (val <= 0) val = 100;
+                setDailyBudget(val);
+                setFeedbackMsg(`📆 Daily budget update: ₹${val} | Ab sambhal ke kharcha!`);
+                setTimeout(() => setFeedbackMsg(prev => prev.includes("budget") ? "✨ Fin-Buddy: Track burn rate 🔥" : prev), 2500);
+            };
+            
+            const progressColor = totalSpent >= dailyBudget ? 'bg-red-500' : (budgetUsedPercent > 80 ? 'bg-orange-400' : 'bg-cyan-400');
+            
+            return React.createElement('div', { className: "max-w-6xl mx-auto py-2 md:py-4 px-2" },
+                // Header
+                React.createElement('div', { className: "flex justify-between items-center mb-5 flex-wrap gap-2" },
+                    React.createElement('div', { className: "flex items-center gap-2" },
+                        React.createElement('i', { className: "fas fa-dragon text-3xl text-[#00F2FF] drop-shadow-lg" }),
+                        React.createElement('h1', { className: "text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r from-white to-cyan-200 bg-clip-text text-transparent" }, "Fin-Buddy"),
+                        React.createElement('span', { className: "text-xs bg-[#00F2FF20] px-2 py-1 rounded-full border border-[#00F2FF40] text-cyan-300" }, "student+")
+                    ),
+                    React.createElement('div', { className: "glass-card px-4 py-2 flex items-center gap-2" },
+                        React.createElement('i', { className: "fas fa-calendar-alt text-[#00F2FF] text-sm" }),
+                        React.createElement('span', { className: "text-white/80 text-sm font-mono" }, `daily cap: ₹${dailyBudget}`)
+                    )
+                ),
+                
+                // Progress Bar
+                React.createElement('div', { className: "glass-card p-4 mb-6" },
+                    React.createElement('div', { className: "flex justify-between items-center text-white/80 text-sm font-medium mb-2" },
+                        React.createElement('span', null, React.createElement('i', { className: "fas fa-fire-flame-curved text-[#00F2FF] mr-1" }), " Burn Rate"),
+                        React.createElement('span', null, `₹${totalSpent} / ₹${dailyBudget}`)
+                    ),
+                    React.createElement('div', { className: "h-3 w-full bg-white/20 rounded-full overflow-hidden backdrop-blur-sm" },
+                        React.createElement('div', { 
+                            className: `progress-fill h-full rounded-full ${progressColor} shadow-[0_0_6px_#00F2FF]`,
+                            style: { width: `${budgetUsedPercent}%` }
+                        })
+                    ),
+                    React.createElement('div', { className: "flex justify-between text-xs text-white/60 mt-2" },
+                        React.createElement('span', null, "0%"),
+                        React.createElement('span', null, `${budgetUsedPercent.toFixed(0)}% used ${totalSpent >= dailyBudget ? "⚠️ Over budget!" : ""}`),
+                        React.createElement('span', null, "100%")
+                    )
+                ),
+                
+                // Dashboard Cards
+                React.createElement('div', { className: "grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6" },
+                    React.createElement('div', { className: "glass-card p-5 flex items-center justify-between" },
+                        React.createElement('div', null,
+                            React.createElement('p', { className: "text-white/50 text-sm uppercase tracking-wide" }, "Total Spent"),
+                            React.createElement('p', { className: "text-3xl font-bold text-white mt-1" }, `₹${totalSpent}`)
+                        ),
+                        React.createElement('i', { className: "fas fa-indian-rupee-sign text-4xl text-[#00F2FF]/70" })
+                    ),
+                    React.createElement('div', { className: "glass-card p-5 flex items-center justify-between" },
+                        React.createElement('div', null,
+                            React.createElement('p', { className: "text-white/50 text-sm uppercase tracking-wide" }, "Remaining"),
+                            React.createElement('p', { className: `text-3xl font-bold mt-1 ${remainingBudget < 0 ? 'text-red-400' : 'text-white'}` }, `₹${Math.max(0, remainingBudget)}`)
+                        ),
+                        React.createElement('i', { className: "fas fa-chart-line text-4xl text-[#00F2FF]/70" })
+                    ),
+                    React.createElement('div', { className: "glass-card p-5 flex items-center justify-between" },
+                        React.createElement('div', null,
+                            React.createElement('p', { className: "text-white/50 text-sm uppercase tracking-wide" }, "Leaky Bucket"),
+                            React.createElement('p', { className: "text-3xl font-bold text-amber-300 mt-1" }, leakyBucketCount),
+                            React.createElement('p', { className: "text-[10px] text-cyan-300/70" }, "under ₹50 spends")
+                        ),
+                        React.createElement('i', { className: "fas fa-water text-4xl text-cyan-300/60" })
+                    )
+                ),
+                
+                // Add Expense Form
+                React.createElement('div', { className: "glass-card p-5 mb-6" },
+                    React.createElement('form', { onSubmit: addTransaction, className: "flex flex-col sm:flex-row gap-3 items-end" },
+                        React.createElement('div', { className: "flex-1 w-full" },
+                            React.createElement('label', { className: "block text-white/60 text-xs mb-1" }, React.createElement('i', { className: "fas fa-tag mr-1" }), "What did you buy?"),
+                            React.createElement('input', {
+                                type: "text",
+                                value: description,
+                                onChange: (e) => setDescription(e.target.value),
+                                placeholder: "e.g., Chai, Auto, Notebook",
+                                className: "w-full bg-black/30 border border-white/20 rounded-2xl px-4 py-3 text-white placeholder:text-white/40 focus:border-[#00F2FF] transition"
+                            })
+                        ),
+                        React.createElement('div', { className: "w-full sm:w-36" },
+                            React.createElement('label', { className: "block text-white/60 text-xs mb-1" }, React.createElement('i', { className: "fas fa-rupee-sign mr-1" }), "Amount (₹)"),
+                            React.createElement('input', {
+                                type: "number",
+                                value: amount,
+                                onChange: (e) => setAmount(e.target.value),
+                                placeholder: "₹",
+                                className: "w-full bg-black/30 border border-white/20 rounded-2xl px-4 py-3 text-white placeholder:text-white/40 focus:border-[#00F2FF]"
+                            })
+                        ),
+                        React.createElement('button', { type: "submit", className: "bg-[#00F2FF] hover:bg-cyan-300 text-black font-semibold px-6 py-3 rounded-2xl transition-all shadow-lg shadow-cyan-500/30 w-full sm:w-auto flex items-center justify-center gap-2" },
+                            React.createElement('i', { className: "fas fa-plus-circle" }), " Track Expense"
+                        )
+                    ),
+                    React.createElement('div', { className: "mt-4 flex items-center gap-3 flex-wrap pt-2 border-t border-white/10" },
+                        React.createElement('label', { className: "text-white/50 text-sm" }, React.createElement('i', { className: "fas fa-wallet" }), " Daily Budget:"),
+                        React.createElement('div', { className: "flex items-center gap-2 bg-black/40 rounded-full px-3 py-1.5" },
+                            React.createElement('i', { className: "fas fa-edit text-cyan-300 text-xs" }),
+                            React.createElement('input', { type: "number", value: dailyBudget, onChange: handleBudgetChange, className: "w-24 bg-transparent text-white font-semibold focus:outline-none" }),
+                            React.createElement('span', { className: "text-white/50" }, "₹")
+                        ),
+                        React.createElement('span', { className: "text-[11px] text-white/40" }, "adjust your spending goal")
+                    )
+                ),
+                
+                // Charts and Feedback
+                React.createElement('div', { className: "grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6" },
+                    React.createElement('div', { className: "glass-card p-5" },
+                        React.createElement('div', { className: "flex items-center gap-2 mb-4" },
+                            React.createElement('i', { className: "fas fa-chart-simple text-[#00F2FF]" }),
+                            React.createElement('h3', { className: "text-white font-semibold" }, "Category spending (₹)")
+                        ),
+                        React.createElement('div', { className: "h-48 flex items-end justify-around gap-3" },
+                            Object.keys(categoryTotals).map(cat => {
+                                const val = categoryTotals[cat];
+                                const heightPercent = maxCategoryVal === 0 ? 0 : (val / maxCategoryVal) * 100;
+                                const barHeight = Math.max(4, heightPercent * 0.8);
+                                return React.createElement('div', { key: cat, className: "flex flex-col items-center w-1/4" },
+                                    React.createElement('div', { className: "w-full flex justify-center mb-2" },
+                                        React.createElement('span', { className: "text-xs font-bold text-white/70" }, cat === 'Food' ? '🍔' : cat === 'Transport' ? '🚗' : cat === 'Academic' ? '📖' : '🎮')
+                                    ),
+                                    React.createElement('div', { className: "w-10 sm:w-12 bg-white/20 rounded-full h-32 flex items-end justify-center overflow-hidden" },
+                                        React.createElement('div', { className: "chart-bar w-full bg-gradient-to-t from-[#00F2FF] to-cyan-300 rounded-full", style: { height: `${barHeight}%` } })
+                                    ),
+                                    React.createElement('p', { className: "text-[11px] text-white/60 mt-2" }, `₹${val}`)
+                                );
+                            })
+                        ),
+                        React.createElement('div', { className: "text-center text-white/40 text-xs mt-4" }, "* smart categories based on keywords")
+                    ),
+                    
+                    React.createElement('div', { className: "glass-card p-5 flex flex-col" },
+                        React.createElement('div', { className: "flex items-center gap-2 border-b border-white/20 pb-2 mb-3" },
+                            React.createElement('i', { className: "fas fa-comment-dots text-[#00F2FF] text-xl" }),
+                            React.createElement('h3', { className: "text-white font-bold" }, "Fin-Buddy Says 💬")
+                        ),
+                        React.createElement('div', { className: "flex-1 flex items-center justify-center p-3 min-h-[110px]" },
+                            React.createElement('p', { className: "text-cyan-100 text-base md:text-lg font-medium text-center leading-relaxed bg-white/5 p-4 rounded-2xl w-full backdrop-blur-sm" }, feedbackMsg)
+                        ),
+                        React.createElement('div', { className: "text-right text-[11px] text-white/40 mt-2" },
+                            React.createElement('i', { className: "fas fa-microphone-alt" }), " Hinglish financial gyaan"
+                        )
+                    )
+                ),
+                
+                // Transaction History
+                React.createElement('div', { className: "glass-card p-5" },
+                    React.createElement('div', { className: "flex justify-between items-center mb-4" },
+                        React.createElement('h3', { className: "text-white font-semibold flex items-center gap-2" }, React.createElement('i', { className: "fas fa-list-ul text-[#00F2FF]" }), " Recent expenses"),
+                        React.createElement('span', { className: "text-white/40 text-xs" }, `${transactions.length} entries`)
+                    ),
+                    transactions.length === 0 ? 
+                        React.createElement('div', { className: "text-center py-10 text-white/40 flex flex-col items-center gap-2" },
+                            React.createElement('i', { className: "fas fa-receipt text-4xl opacity-40" }),
+                            React.createElement('p', null, "No expenses yet! Add your first chai or book 📝")
+                        ) :
+                        React.createElement('div', { className: "max-h-80 overflow-y-auto pr-1 space-y-2" },
+                            transactions.map((tx) => 
+                                React.createElement('div', { key: tx.id, className: "slide-item bg-white/5 hover:bg-white/10 rounded-2xl p-3 flex items-center justify-between transition-all" },
+                                    React.createElement('div', { className: "flex items-center gap-3 flex-wrap sm:flex-nowrap" },
+                                        React.createElement('div', { className: "text-2xl" }, tx.icon),
+                                        React.createElement('div', null,
+                                            React.createElement('p', { className: "text-white font-medium" }, tx.description),
+                                            React.createElement('div', { className: "flex gap-2 text-[11px] text-white/40" },
+                                                React.createElement('span', null, tx.category),
+                                                React.createElement('span', null, "•"),
+                                                React.createElement('span', null, tx.timestamp)
+                                            )
+                                        )
+                                    ),
+                                    React.createElement('div', { className: "flex items-center gap-3" },
+                                        React.createElement('span', { className: "text-white font-mono font-semibold" }, `₹${tx.amount}`),
+                                        React.createElement('button', { onClick: () => deleteTransaction(tx.id), className: "text-white/40 hover:text-red-400 transition p-1" },
+                                            React.createElement('i', { className: "fas fa-trash-can" })
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                    leakyBucketCount > 2 && 
+                        React.createElement('div', { className: "mt-4 text-xs bg-red-500/20 border border-red-400/30 rounded-xl p-2 text-rose-200 text-center" },
+                            React.createElement('i', { className: "fas fa-tint" }), ` Alert: ${leakyBucketCount} small spends (<₹50) are leaking your wallet!`
+                        )
+                ),
+                
+                // Footer
+                React.createElement('div', { className: "text-center mt-6 text-white/30 text-xs flex justify-center gap-4" },
+                    React.createElement('span', null, React.createElement('i', { className: "fas fa-chart-line" }), " Burn rate active"),
+                    React.createElement('span', null, React.createElement('i', { className: "fas fa-smile-wink" }), " Cred-style glassmorphism"),
+                    React.createElement('span', null, React.createElement('i', { className: "fas fa-mobile-alt" }), " On-the-go tracker")
+                )
+            );
+        };
+        
+        // Render the app
+        ReactDOM.render(React.createElement(FinBuddyApp, null), document.getElementById("root"));
+    </script>
+</body>
+</html>
