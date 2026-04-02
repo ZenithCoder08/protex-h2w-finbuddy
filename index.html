@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <title>Fin-Buddy | Student Expense Tracker</title>
+    <title>Fin-Buddy | Student Neobank - Your Financial Survival Kit</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- React & ReactDOM (UMD) -->
+    <!-- React & ReactDOM -->
     <script src="https://unpkg.com/react@18.2.0/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
-    <!-- Babel Standalone -->
+    <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
     <style>
@@ -22,13 +22,13 @@
         }
         
         body {
-            background: radial-gradient(circle at 10% 30%, #121826, #0A0F16);
+            background: #0B0E14;
             min-height: 100vh;
-            padding: 1rem;
             margin: 0;
+            overflow-x: hidden;
         }
         
-        /* Glassmorphism core */
+        /* Glassmorphism Core */
         .glass-card {
             background: rgba(20, 28, 38, 0.65);
             backdrop-filter: blur(12px);
@@ -44,22 +44,90 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 242, 255, 0.3) inset;
         }
         
-        /* custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 4px;
+        .glass-input {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 242, 255, 0.3);
+            transition: all 0.2s ease;
         }
         
-        ::-webkit-scrollbar-track {
-            background: #1E2A36;
-            border-radius: 10px;
+        .glass-input:focus {
+            outline: none;
+            border-color: #00F2FF;
+            box-shadow: 0 0 0 3px rgba(0, 242, 255, 0.2);
         }
         
-        ::-webkit-scrollbar-thumb {
-            background: #00F2FF;
-            border-radius: 10px;
+        /* Slide-up animation */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
-        /* slide-in animation */
+        .screen-transition {
+            animation: slideUp 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
+        }
+        
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.15);
+            transition: 0.3s;
+            border-radius: 30px;
+            border: 1px solid rgba(0, 242, 255, 0.4);
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 24px;
+            width: 24px;
+            left: 3px;
+            bottom: 2px;
+            background-color: #00F2FF;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: rgba(0, 242, 255, 0.25);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(29px);
+        }
+        
+        /* Progress Bar */
+        .progress-fill {
+            transition: width 0.5s ease-out;
+        }
+        
+        .chart-bar {
+            transition: height 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+        
         @keyframes slideIn {
             from {
                 opacity: 0;
@@ -75,31 +143,32 @@
             animation: slideIn 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
         }
         
-        /* progress bar transition */
-        .progress-fill {
-            transition: width 0.5s ease-out;
+        .glow-button {
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.5);
+            transition: all 0.2s ease;
         }
         
-        /* chart bars transition */
-        .chart-bar {
-            transition: height 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-        }
-        
-        /* custom input focus ring */
-        input:focus, button:focus {
-            outline: none;
-        }
-        
-        input:focus {
-            box-shadow: 0 0 0 2px rgba(0, 242, 255, 0.4);
-            border-color: #00F2FF !important;
+        .glow-button:hover {
+            box-shadow: 0 0 25px rgba(0, 242, 255, 0.7);
+            transform: scale(1.02);
         }
         
         button:active {
-            transform: scale(0.97);
+            transform: scale(0.98);
         }
         
-        /* responsive touch */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1E2A36;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #00F2FF;
+            border-radius: 10px;
+        }
+        
         @media (max-width: 640px) {
             body {
                 padding: 0.75rem;
@@ -108,14 +177,29 @@
                 border-radius: 1.5rem;
             }
         }
+        
+        @keyframes gentlePulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .survival-pulse {
+            animation: gentlePulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+            animation: spin 1s linear infinite;
+        }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        // ----------------------------- HELPER FUNCTIONS ---------------------------------
-        // Smart Categorization + Icon mapping based on keywords
+        // Helper Functions
         const getCategoryAndIcon = (description) => {
             const lowerDesc = description.toLowerCase();
             if (lowerDesc.includes('chai') || lowerDesc.includes('coffee') || lowerDesc.includes('tea') || lowerDesc.includes('cafe')) 
@@ -126,34 +210,11 @@
                 return { category: 'Academic', icon: '📚' };
             if (lowerDesc.includes('movie') || lowerDesc.includes('game') || lowerDesc.includes('party') || lowerDesc.includes('netflix') || lowerDesc.includes('spotify'))
                 return { category: 'Fun', icon: '🎉' };
-            // default fallback
-            if (lowerDesc.includes('food') || lowerDesc.includes('lunch') || lowerDesc.includes('dinner') || lowerDesc.includes('snack')) 
+            if (lowerDesc.includes('food') || lowerDesc.includes('lunch') || lowerDesc.includes('dinner') || lowerDesc.includes('snack') || lowerDesc.includes('canteen') || lowerDesc.includes('meal'))
                 return { category: 'Food', icon: '🍔' };
-            if (lowerDesc.includes('petrol') || lowerDesc.includes('fuel')) 
-                return { category: 'Transport', icon: '⛽' };
             return { category: 'Fun', icon: '✨' };
         };
 
-        // Hinglish funny tips based on spend amount
-        const getFinBuddyTip = (lastAmount, totalSpentToday) => {
-            const tips = [
-                "💸 Bhai, itna kharcha? Kal se canteen band! 🏦",
-                "📉 Tuze lagta hai paisa udta hai? Budget bana le yaar!",
-                "🤑 Chai ke 10 rupaye bachake crorepati banja!",
-                "⚡ Leaky bucket? Chhoti chhoti kharcha se bach, champion ban!",
-                "🎓 Books liya? Smart investment, but samose pe control 🙏",
-                "🚗 Auto wale bhai ko mana kar, walk kar, fit aur rich!",
-                "🍕 Pizza ya books? Choose wisely, Fin-Buddy dekh raha hai!",
-                "📉 Daily burn rate dekh? Teri savings ro rahi hai 😭",
-                "⭐ Tip: 50₹ se neeche ka expense is 'Leaky Bucket' — tu leak seal kar!"
-            ];
-            if (lastAmount > 100) return "🚨 Bade bhai, ₹100+ uda diya? " + tips[0];
-            if (lastAmount > 50) return "⚠️ Thoda sahen kar, ₹50 bachta toh aaj mast treat! " + tips[2];
-            if (totalSpentToday > 300) return "🔥 Aggressive kharcha! Fin-Buddy bolta hai: 'Kal se tiffin laana' 🍱";
-            return tips[Math.floor(Math.random() * tips.length)];
-        };
-
-        // Helper to get category totals from transactions
         const getCategoryTotals = (transactions) => {
             const map = { Food: 0, Transport: 0, Academic: 0, Fun: 0 };
             transactions.forEach(t => {
@@ -163,262 +224,452 @@
             return map;
         };
 
-        // ----------------------------- MAIN COMPONENT ------------------------------------
-        const FinBuddyApp = () => {
+        const getDaysLeftInMonth = () => {
+            const today = new Date();
+            const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            return lastDay.getDate() - today.getDate();
+        };
+
+        const getHinglishMessage = (totalSpent, budget, isMonthly, safeDailyLimit, remainingDays) => {
+            const messages = [
+                "Bhai, control kar warna month-end mein sirf Maggi milegi! 🍜",
+                "🚨 Overspending alert! Budget ro raha hai! 😭",
+                "Arey yaar, thoda bachake rakh! Chai ke paise bachao! ☕",
+                "Subscription cancel kar, paisa bachega! 🕵️",
+                "Auto ki jagah walk kar, fit aur rich! 🚶",
+                "Tera future version tujhe thank you bolega! 💪"
+            ];
+            
+            if (totalSpent > budget * 0.7) {
+                return messages[Math.floor(Math.random() * 3)] + " Aggressive kharcha band karo!";
+            }
+            if (isMonthly && safeDailyLimit > 0 && totalSpent / Math.max(1, 30 - remainingDays) > safeDailyLimit) {
+                return "⚠️ Aaj ka safe daily limit cross! Kal se sambhal ke kharcha! ⚠️";
+            }
+            return messages[Math.floor(Math.random() * messages.length)];
+        };
+
+        // Landing Screen
+        const LandingScreen = ({ onGetStarted }) => {
+            return (
+                <div className="min-h-screen flex items-center justify-center px-4 py-8 screen-transition">
+                    <div className="max-w-6xl w-full">
+                        <div className="text-center mb-16">
+                            <div className="inline-flex items-center gap-2 bg-[#00F2FF]/10 px-4 py-2 rounded-full border border-[#00F2FF]/30 mb-6">
+                                <i className="fas fa-dragon text-[#00F2FF] text-sm"></i>
+                                <span className="text-[#00F2FF] text-xs font-semibold tracking-wide">FIN-BUDDY NEOBANK</span>
+                            </div>
+                            <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-white to-cyan-300 bg-clip-text text-transparent mb-6">
+                                Your Financial<br />Survival Kit
+                            </h1>
+                            <p className="text-white/60 text-lg md:text-xl max-w-2xl mx-auto">
+                                The first neobank that talks like your hostel roommate. OCR scan, subscription spy, and survival predictions.
+                            </p>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+                            <div className="glass-card p-6 text-center">
+                                <div className="w-16 h-16 bg-[#00F2FF]/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                    <i className="fas fa-camera text-3xl text-[#00F2FF]"></i>
+                                </div>
+                                <h3 className="text-white font-bold text-xl mb-2">OCR Snap-to-Track</h3>
+                                <p className="text-white/50 text-sm">Upload bill, AI reads and auto-adds expenses. No typing needed.</p>
+                            </div>
+                            <div className="glass-card p-6 text-center">
+                                <div className="w-16 h-16 bg-[#00F2FF]/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                    <i className="fas fa-user-secret text-3xl text-[#00F2FF]"></i>
+                                </div>
+                                <h3 className="text-white font-bold text-xl mb-2">Subscription Detective</h3>
+                                <p className="text-white/50 text-sm">Flags ₹199, ₹49, ₹699 spends. Catch auto-renewals before they catch you.</p>
+                            </div>
+                            <div className="glass-card p-6 text-center">
+                                <div className="w-16 h-16 bg-[#00F2FF]/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                    <i className="fas fa-chart-line text-3xl text-[#00F2FF]"></i>
+                                </div>
+                                <h3 className="text-white font-bold text-xl mb-2">Survival Prediction</h3>
+                                <p className="text-white/50 text-sm">"Paisa kab khatam hoga?" Real-time countdown + what-if simulator.</p>
+                            </div>
+                        </div>
+                        
+                        <div className="text-center">
+                            <button onClick={onGetStarted} className="bg-[#00F2FF] hover:bg-cyan-300 text-black font-bold px-8 py-4 rounded-2xl text-lg transition-all shadow-2xl shadow-[#00F2FF]/30 flex items-center gap-3 mx-auto glow-button">
+                                <i className="fas fa-user-plus"></i>
+                                Enter the Squad
+                                <i className="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Login Screen
+        const LoginScreen = ({ onLogin }) => {
+            const [email, setEmail] = React.useState("");
+            const [pin, setPin] = React.useState("");
+            const [error, setError] = React.useState("");
+            
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if (!email.trim() || !pin.trim()) {
+                    setError("Bhai, ID aur PIN dono daal!");
+                    return;
+                }
+                setError("");
+                onLogin();
+            };
+            
+            return (
+                <div className="min-h-screen flex items-center justify-center px-4 screen-transition">
+                    <div className="glass-card p-8 md:p-10 w-full max-w-md border-[#00F2FF]/40 shadow-[0_0_20px_rgba(0,242,255,0.15)]">
+                        <div className="text-center mb-8">
+                            <i className="fas fa-dragon text-5xl text-[#00F2FF] mb-3"></i>
+                            <h2 className="text-2xl font-bold text-white">The Entry</h2>
+                            <p className="text-white/50 text-sm mt-2">Enter credentials to access your financial survival kit</p>
+                        </div>
+                        <form onSubmit={handleSubmit} className="space-y-5">
+                            <div>
+                                <label className="block text-white/70 text-sm mb-2">
+                                    <i className="fas fa-envelope mr-2 text-[#00F2FF]"></i> Student ID / Email
+                                </label>
+                                <input
+                                    type="text"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="glass-input w-full px-4 py-3 rounded-xl text-white placeholder-white/30"
+                                    placeholder="squad@finbuddy.com"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-white/70 text-sm mb-2">
+                                    <i className="fas fa-lock mr-2 text-[#00F2FF]"></i> Secret Pin
+                                </label>
+                                <input
+                                    type="password"
+                                    value={pin}
+                                    onChange={(e) => setPin(e.target.value)}
+                                    className="glass-input w-full px-4 py-3 rounded-xl text-white placeholder-white/30"
+                                    placeholder="••••"
+                                />
+                            </div>
+                            {error && <p className="text-red-400 text-xs text-center">{error}</p>}
+                            <button type="submit" className="w-full bg-[#00F2FF] hover:bg-cyan-300 text-black font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 mt-4 glow-button">
+                                <i className="fas fa-coins"></i>
+                                Get Funded
+                                <i className="fas fa-arrow-right"></i>
+                            </button>
+                        </form>
+                        <p className="text-center text-white/30 text-xs mt-6">Demo mode: any ID & PIN works • Neobank for students</p>
+                    </div>
+                </div>
+            );
+        };
+
+        // Dashboard Screen with OCR Feature
+        const Dashboard = () => {
             const [transactions, setTransactions] = React.useState([]);
             const [description, setDescription] = React.useState("");
             const [amount, setAmount] = React.useState("");
             const [dailyBudget, setDailyBudget] = React.useState(500);
-            const [feedbackMsg, setFeedbackMsg] = React.useState("✨ Fin-Buddy: Add expense, get smart tips!");
+            const [monthlyBudget, setMonthlyBudget] = React.useState(5000);
+            const [isMonthlyView, setIsMonthlyView] = React.useState(true);
+            const [feedbackMsg, setFeedbackMsg] = React.useState("✨ Fin-Buddy: Track your expenses, survive the month!");
+            const [isScanning, setIsScanning] = React.useState(false);
             
             const totalSpent = transactions.reduce((sum, t) => sum + t.amount, 0);
-            const remainingBudget = dailyBudget - totalSpent;
-            const budgetUsedPercent = Math.min(100, Math.max(0, (totalSpent / dailyBudget) * 100));
+            const daysLeft = getDaysLeftInMonth();
+            const remainingBudget = (isMonthlyView ? monthlyBudget : dailyBudget) - totalSpent;
+            const safeDailyLimit = isMonthlyView ? Math.max(0, remainingBudget / Math.max(1, daysLeft)) : dailyBudget;
+            const budgetUsedPercent = Math.min(100, Math.max(0, (totalSpent / (isMonthlyView ? monthlyBudget : dailyBudget)) * 100));
             const leakyBucketCount = transactions.filter(t => t.amount < 50).length;
-            
             const categoryTotals = getCategoryTotals(transactions);
             const maxCategoryVal = Math.max(1, ...Object.values(categoryTotals));
             
-            const addTransaction = (e) => {
-                e.preventDefault();
-                if (!description.trim()) {
-                    setFeedbackMsg("⚠️ Bhai, kya khareeda? Description daal!");
-                    return;
-                }
-                const amtNum = parseFloat(amount);
-                if (isNaN(amtNum) || amtNum <= 0) {
-                    setFeedbackMsg("💰 Sahi amount daal (₹ positive number)");
-                    return;
-                }
-                
-                const { category, icon } = getCategoryAndIcon(description);
+            const avgDailySpend = transactions.length > 0 ? totalSpent / Math.max(1, 30 - daysLeft) : 100;
+            const survivalDays = remainingBudget > 0 && avgDailySpend > 0 ? Math.floor(remainingBudget / avgDailySpend) : 0;
+            const survivalMessage = survivalDays < daysLeft ? `⚠️ At this rate, your money lasts only ${Math.max(1, survivalDays)} days.` : `✅ Smart spending! Your money will last the month.`;
+            
+            const proTip = `💡 Pro-Tip: Cut food spend by ₹50/day to survive for ${Math.max(survivalDays + 3, survivalDays + 5)} days!`;
+            
+            const aiMessage = getHinglishMessage(totalSpent, isMonthlyView ? monthlyBudget : dailyBudget, isMonthlyView, safeDailyLimit, daysLeft);
+            
+            const addTransaction = (desc, amt, isOCRSourced = false) => {
+                if (!desc.trim()) return false;
+                const amtNum = parseFloat(amt);
+                if (isNaN(amtNum) || amtNum <= 0) return false;
+                const { category, icon } = getCategoryAndIcon(desc);
                 const newTx = {
-                    id: Date.now(),
-                    description: description.trim(),
+                    id: Date.now() + Math.random(),
+                    description: desc.trim(),
                     amount: amtNum,
                     category: category,
                     icon: icon,
                     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' })
                 };
-                
                 setTransactions(prev => [newTx, ...prev]);
+                if (isOCRSourced) {
+                    setFeedbackMsg(`✅ OCR Detected: ${desc} - ₹${amtNum} added! Gemini AI at your service! 🤖`);
+                } else {
+                    setFeedbackMsg(`🤖 ${aiMessage}`);
+                }
+                setTimeout(() => setFeedbackMsg("✨ Fin-Buddy: Keep tracking, champion!"), 4000);
+                return true;
+            };
+            
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                addTransaction(description, amount, false);
                 setDescription("");
                 setAmount("");
+            };
+            
+            // OCR Scan Simulation
+            const handleOCRScan = () => {
+                setIsScanning(true);
+                setFeedbackMsg("📸 OCR scanning receipt... Gemini Vision AI analyzing canteen bill... 🤖");
                 
-                const newTotal = totalSpent + amtNum;
-                const tip = getFinBuddyTip(amtNum, newTotal);
-                setFeedbackMsg(`💬 ${tip}`);
-                
+                // Simulate OCR processing delay
                 setTimeout(() => {
-                    setFeedbackMsg(prev => prev === `💬 ${tip}` ? "✨ Fin-Buddy: Keep tracking, champion!" : prev);
-                }, 4500);
+                    setIsScanning(false);
+                    // Simulate detected items from receipt
+                    const scannedItems = [
+                        { name: "Canteen Meal Combo", amount: 180 },
+                        { name: "Chai & Samosa", amount: 45 },
+                        { name: "Library Fine", amount: 50 },
+                        { name: "Stationery (Notebook)", amount: 85 }
+                    ];
+                    const randomItem = scannedItems[Math.floor(Math.random() * scannedItems.length)];
+                    addTransaction(randomItem.name, randomItem.amount, true);
+                }, 2000);
             };
             
             const deleteTransaction = (id) => {
                 setTransactions(prev => prev.filter(t => t.id !== id));
-                setFeedbackMsg("🗑️ Expense hata diya! Ab budget thoda relax 😎");
-                setTimeout(() => setFeedbackMsg(prev => prev.includes("relax") ? "✨ Fin-Buddy: Add more expenses to analyse!" : prev), 2500);
+                setFeedbackMsg("🗑️ Expense hata diya! Budget thoda relax 😎");
             };
             
-            const handleBudgetChange = (e) => {
-                let val = parseInt(e.target.value);
-                if (isNaN(val)) val = 500;
-                if (val <= 0) val = 100;
-                setDailyBudget(val);
-                setFeedbackMsg(`📆 Daily budget update: ₹${val} | Ab sambhal ke kharcha!`);
-                setTimeout(() => setFeedbackMsg(prev => prev.includes("budget") ? "✨ Fin-Buddy: Track burn rate 🔥" : prev), 2500);
-            };
+            const progressColor = totalSpent >= (isMonthlyView ? monthlyBudget : dailyBudget) ? 'bg-red-500' : (budgetUsedPercent > 80 ? 'bg-orange-400' : 'bg-cyan-400');
+            const isCritical = survivalDays < 5;
             
-            const progressColor = totalSpent >= dailyBudget ? 'bg-red-500' : (budgetUsedPercent > 80 ? 'bg-orange-400' : 'bg-cyan-400');
-            
-            return React.createElement('div', { className: "max-w-6xl mx-auto py-2 md:py-4 px-2" },
-                // Header
-                React.createElement('div', { className: "flex justify-between items-center mb-5 flex-wrap gap-2" },
-                    React.createElement('div', { className: "flex items-center gap-2" },
-                        React.createElement('i', { className: "fas fa-dragon text-3xl text-[#00F2FF] drop-shadow-lg" }),
-                        React.createElement('h1', { className: "text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r from-white to-cyan-200 bg-clip-text text-transparent" }, "Fin-Buddy"),
-                        React.createElement('span', { className: "text-xs bg-[#00F2FF20] px-2 py-1 rounded-full border border-[#00F2FF40] text-cyan-300" }, "student+")
-                    ),
-                    React.createElement('div', { className: "glass-card px-4 py-2 flex items-center gap-2" },
-                        React.createElement('i', { className: "fas fa-calendar-alt text-[#00F2FF] text-sm" }),
-                        React.createElement('span', { className: "text-white/80 text-sm font-mono" }, `daily cap: ₹${dailyBudget}`)
-                    )
-                ),
-                
-                // Progress Bar
-                React.createElement('div', { className: "glass-card p-4 mb-6" },
-                    React.createElement('div', { className: "flex justify-between items-center text-white/80 text-sm font-medium mb-2" },
-                        React.createElement('span', null, React.createElement('i', { className: "fas fa-fire-flame-curved text-[#00F2FF] mr-1" }), " Burn Rate"),
-                        React.createElement('span', null, `₹${totalSpent} / ₹${dailyBudget}`)
-                    ),
-                    React.createElement('div', { className: "h-3 w-full bg-white/20 rounded-full overflow-hidden backdrop-blur-sm" },
-                        React.createElement('div', { 
-                            className: `progress-fill h-full rounded-full ${progressColor} shadow-[0_0_6px_#00F2FF]`,
-                            style: { width: `${budgetUsedPercent}%` }
-                        })
-                    ),
-                    React.createElement('div', { className: "flex justify-between text-xs text-white/60 mt-2" },
-                        React.createElement('span', null, "0%"),
-                        React.createElement('span', null, `${budgetUsedPercent.toFixed(0)}% used ${totalSpent >= dailyBudget ? "⚠️ Over budget!" : ""}`),
-                        React.createElement('span', null, "100%")
-                    )
-                ),
-                
-                // Dashboard Cards
-                React.createElement('div', { className: "grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6" },
-                    React.createElement('div', { className: "glass-card p-5 flex items-center justify-between" },
-                        React.createElement('div', null,
-                            React.createElement('p', { className: "text-white/50 text-sm uppercase tracking-wide" }, "Total Spent"),
-                            React.createElement('p', { className: "text-3xl font-bold text-white mt-1" }, `₹${totalSpent}`)
-                        ),
-                        React.createElement('i', { className: "fas fa-indian-rupee-sign text-4xl text-[#00F2FF]/70" })
-                    ),
-                    React.createElement('div', { className: "glass-card p-5 flex items-center justify-between" },
-                        React.createElement('div', null,
-                            React.createElement('p', { className: "text-white/50 text-sm uppercase tracking-wide" }, "Remaining"),
-                            React.createElement('p', { className: `text-3xl font-bold mt-1 ${remainingBudget < 0 ? 'text-red-400' : 'text-white'}` }, `₹${Math.max(0, remainingBudget)}`)
-                        ),
-                        React.createElement('i', { className: "fas fa-chart-line text-4xl text-[#00F2FF]/70" })
-                    ),
-                    React.createElement('div', { className: "glass-card p-5 flex items-center justify-between" },
-                        React.createElement('div', null,
-                            React.createElement('p', { className: "text-white/50 text-sm uppercase tracking-wide" }, "Leaky Bucket"),
-                            React.createElement('p', { className: "text-3xl font-bold text-amber-300 mt-1" }, leakyBucketCount),
-                            React.createElement('p', { className: "text-[10px] text-cyan-300/70" }, "under ₹50 spends")
-                        ),
-                        React.createElement('i', { className: "fas fa-water text-4xl text-cyan-300/60" })
-                    )
-                ),
-                
-                // Add Expense Form
-                React.createElement('div', { className: "glass-card p-5 mb-6" },
-                    React.createElement('form', { onSubmit: addTransaction, className: "flex flex-col sm:flex-row gap-3 items-end" },
-                        React.createElement('div', { className: "flex-1 w-full" },
-                            React.createElement('label', { className: "block text-white/60 text-xs mb-1" }, React.createElement('i', { className: "fas fa-tag mr-1" }), "What did you buy?"),
-                            React.createElement('input', {
-                                type: "text",
-                                value: description,
-                                onChange: (e) => setDescription(e.target.value),
-                                placeholder: "e.g., Chai, Auto, Notebook",
-                                className: "w-full bg-black/30 border border-white/20 rounded-2xl px-4 py-3 text-white placeholder:text-white/40 focus:border-[#00F2FF] transition"
-                            })
-                        ),
-                        React.createElement('div', { className: "w-full sm:w-36" },
-                            React.createElement('label', { className: "block text-white/60 text-xs mb-1" }, React.createElement('i', { className: "fas fa-rupee-sign mr-1" }), "Amount (₹)"),
-                            React.createElement('input', {
-                                type: "number",
-                                value: amount,
-                                onChange: (e) => setAmount(e.target.value),
-                                placeholder: "₹",
-                                className: "w-full bg-black/30 border border-white/20 rounded-2xl px-4 py-3 text-white placeholder:text-white/40 focus:border-[#00F2FF]"
-                            })
-                        ),
-                        React.createElement('button', { type: "submit", className: "bg-[#00F2FF] hover:bg-cyan-300 text-black font-semibold px-6 py-3 rounded-2xl transition-all shadow-lg shadow-cyan-500/30 w-full sm:w-auto flex items-center justify-center gap-2" },
-                            React.createElement('i', { className: "fas fa-plus-circle" }), " Track Expense"
-                        )
-                    ),
-                    React.createElement('div', { className: "mt-4 flex items-center gap-3 flex-wrap pt-2 border-t border-white/10" },
-                        React.createElement('label', { className: "text-white/50 text-sm" }, React.createElement('i', { className: "fas fa-wallet" }), " Daily Budget:"),
-                        React.createElement('div', { className: "flex items-center gap-2 bg-black/40 rounded-full px-3 py-1.5" },
-                            React.createElement('i', { className: "fas fa-edit text-cyan-300 text-xs" }),
-                            React.createElement('input', { type: "number", value: dailyBudget, onChange: handleBudgetChange, className: "w-24 bg-transparent text-white font-semibold focus:outline-none" }),
-                            React.createElement('span', { className: "text-white/50" }, "₹")
-                        ),
-                        React.createElement('span', { className: "text-[11px] text-white/40" }, "adjust your spending goal")
-                    )
-                ),
-                
-                // Charts and Feedback
-                React.createElement('div', { className: "grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6" },
-                    React.createElement('div', { className: "glass-card p-5" },
-                        React.createElement('div', { className: "flex items-center gap-2 mb-4" },
-                            React.createElement('i', { className: "fas fa-chart-simple text-[#00F2FF]" }),
-                            React.createElement('h3', { className: "text-white font-semibold" }, "Category spending (₹)")
-                        ),
-                        React.createElement('div', { className: "h-48 flex items-end justify-around gap-3" },
-                            Object.keys(categoryTotals).map(cat => {
-                                const val = categoryTotals[cat];
-                                const heightPercent = maxCategoryVal === 0 ? 0 : (val / maxCategoryVal) * 100;
-                                const barHeight = Math.max(4, heightPercent * 0.8);
-                                return React.createElement('div', { key: cat, className: "flex flex-col items-center w-1/4" },
-                                    React.createElement('div', { className: "w-full flex justify-center mb-2" },
-                                        React.createElement('span', { className: "text-xs font-bold text-white/70" }, cat === 'Food' ? '🍔' : cat === 'Transport' ? '🚗' : cat === 'Academic' ? '📖' : '🎮')
-                                    ),
-                                    React.createElement('div', { className: "w-10 sm:w-12 bg-white/20 rounded-full h-32 flex items-end justify-center overflow-hidden" },
-                                        React.createElement('div', { className: "chart-bar w-full bg-gradient-to-t from-[#00F2FF] to-cyan-300 rounded-full", style: { height: `${barHeight}%` } })
-                                    ),
-                                    React.createElement('p', { className: "text-[11px] text-white/60 mt-2" }, `₹${val}`)
-                                );
-                            })
-                        ),
-                        React.createElement('div', { className: "text-center text-white/40 text-xs mt-4" }, "* smart categories based on keywords")
-                    ),
+            return (
+                <div className="max-w-6xl mx-auto py-4 px-4 screen-transition">
+                    {/* Header */}
+                    <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
+                        <div className="flex items-center gap-2">
+                            <i className="fas fa-dragon text-3xl text-[#00F2FF]"></i>
+                            <h1 className="text-2xl md:text-3xl font-bold text-white">Fin-Buddy Dashboard</h1>
+                            <span className="text-xs bg-[#00F2FF20] px-2 py-1 rounded-full text-cyan-300">Neobank</span>
+                        </div>
+                        <div className="flex items-center gap-3 glass-card px-4 py-2">
+                            <i className={`fas fa-calendar-${isMonthlyView ? 'alt' : 'day'} text-[#00F2FF] text-sm`}></i>
+                            <label className="toggle-switch">
+                                <input type="checkbox" checked={isMonthlyView} onChange={() => setIsMonthlyView(!isMonthlyView)} />
+                                <span className="toggle-slider"></span>
+                            </label>
+                            <i className={`fas fa-${isMonthlyView ? 'chart-line' : 'fire'} text-[#00F2FF] text-sm`}></i>
+                            <span className="text-white/80 text-xs font-medium">{isMonthlyView ? "Monthly" : "Daily"}</span>
+                        </div>
+                    </div>
                     
-                    React.createElement('div', { className: "glass-card p-5 flex flex-col" },
-                        React.createElement('div', { className: "flex items-center gap-2 border-b border-white/20 pb-2 mb-3" },
-                            React.createElement('i', { className: "fas fa-comment-dots text-[#00F2FF] text-xl" }),
-                            React.createElement('h3', { className: "text-white font-bold" }, "Fin-Buddy Says 💬")
-                        ),
-                        React.createElement('div', { className: "flex-1 flex items-center justify-center p-3 min-h-[110px]" },
-                            React.createElement('p', { className: "text-cyan-100 text-base md:text-lg font-medium text-center leading-relaxed bg-white/5 p-4 rounded-2xl w-full backdrop-blur-sm" }, feedbackMsg)
-                        ),
-                        React.createElement('div', { className: "text-right text-[11px] text-white/40 mt-2" },
-                            React.createElement('i', { className: "fas fa-microphone-alt" }), " Hinglish financial gyaan"
-                        )
-                    )
-                ),
-                
-                // Transaction History
-                React.createElement('div', { className: "glass-card p-5" },
-                    React.createElement('div', { className: "flex justify-between items-center mb-4" },
-                        React.createElement('h3', { className: "text-white font-semibold flex items-center gap-2" }, React.createElement('i', { className: "fas fa-list-ul text-[#00F2FF]" }), " Recent expenses"),
-                        React.createElement('span', { className: "text-white/40 text-xs" }, `${transactions.length} entries`)
-                    ),
-                    transactions.length === 0 ? 
-                        React.createElement('div', { className: "text-center py-10 text-white/40 flex flex-col items-center gap-2" },
-                            React.createElement('i', { className: "fas fa-receipt text-4xl opacity-40" }),
-                            React.createElement('p', null, "No expenses yet! Add your first chai or book 📝")
-                        ) :
-                        React.createElement('div', { className: "max-h-80 overflow-y-auto pr-1 space-y-2" },
-                            transactions.map((tx) => 
-                                React.createElement('div', { key: tx.id, className: "slide-item bg-white/5 hover:bg-white/10 rounded-2xl p-3 flex items-center justify-between transition-all" },
-                                    React.createElement('div', { className: "flex items-center gap-3 flex-wrap sm:flex-nowrap" },
-                                        React.createElement('div', { className: "text-2xl" }, tx.icon),
-                                        React.createElement('div', null,
-                                            React.createElement('p', { className: "text-white font-medium" }, tx.description),
-                                            React.createElement('div', { className: "flex gap-2 text-[11px] text-white/40" },
-                                                React.createElement('span', null, tx.category),
-                                                React.createElement('span', null, "•"),
-                                                React.createElement('span', null, tx.timestamp)
-                                            )
-                                        )
-                                    ),
-                                    React.createElement('div', { className: "flex items-center gap-3" },
-                                        React.createElement('span', { className: "text-white font-mono font-semibold" }, `₹${tx.amount}`),
-                                        React.createElement('button', { onClick: () => deleteTransaction(tx.id), className: "text-white/40 hover:text-red-400 transition p-1" },
-                                            React.createElement('i', { className: "fas fa-trash-can" })
-                                        )
-                                    )
-                                )
-                            )
-                        ),
-                    leakyBucketCount > 2 && 
-                        React.createElement('div', { className: "mt-4 text-xs bg-red-500/20 border border-red-400/30 rounded-xl p-2 text-rose-200 text-center" },
-                            React.createElement('i', { className: "fas fa-tint" }), ` Alert: ${leakyBucketCount} small spends (<₹50) are leaking your wallet!`
-                        )
-                ),
-                
-                // Footer
-                React.createElement('div', { className: "text-center mt-6 text-white/30 text-xs flex justify-center gap-4" },
-                    React.createElement('span', null, React.createElement('i', { className: "fas fa-chart-line" }), " Burn rate active"),
-                    React.createElement('span', null, React.createElement('i', { className: "fas fa-smile-wink" }), " Cred-style glassmorphism"),
-                    React.createElement('span', null, React.createElement('i', { className: "fas fa-mobile-alt" }), " On-the-go tracker")
-                )
+                    {/* Survival Timer Card */}
+                    <div className={`glass-card p-5 mb-6 ${isCritical ? 'border-red-500/50' : ''}`}>
+                        <div className="flex items-start justify-between flex-wrap gap-4">
+                            <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <i className={`fas fa-hourglass-half text-2xl ${isCritical ? 'text-red-400 survival-pulse' : 'text-[#00F2FF]'}`}></i>
+                                    <h2 className="text-white font-bold text-xl">Paisa Kab Khatam Hoga? ⏳</h2>
+                                </div>
+                                <p className={`text-3xl font-bold mb-2 ${isCritical ? 'text-red-400' : 'text-[#00F2FF]'}`}>{Math.max(1, survivalDays)} days</p>
+                                <p className="text-white/70 text-sm">{survivalMessage}</p>
+                                <div className="mt-3 bg-cyan-500/10 rounded-xl p-3 border border-[#00F2FF]/30">
+                                    <i className="fas fa-lightbulb text-[#00F2FF] mr-2"></i>
+                                    <span className="text-cyan-200 text-sm">{proTip}</span>
+                                </div>
+                            </div>
+                            <div className="text-center bg-black/30 rounded-2xl p-4 min-w-[120px]">
+                                <i className="fas fa-chart-simple text-2xl text-[#00F2FF] mb-1 block"></i>
+                                <p className="text-white/50 text-xs">Burn Rate</p>
+                                <p className="text-white font-bold text-xl">{budgetUsedPercent.toFixed(0)}%</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Budget Progress */}
+                    <div className="glass-card p-4 mb-6">
+                        <div className="flex justify-between items-center text-white/80 text-sm font-medium mb-2">
+                            <span><i className="fas fa-wallet text-[#00F2FF] mr-1"></i> {isMonthlyView ? 'Monthly Allowance' : 'Daily Budget'}</span>
+                            <span>₹{totalSpent} / ₹{isMonthlyView ? monthlyBudget : dailyBudget}</span>
+                        </div>
+                        <div className="h-3 w-full bg-white/20 rounded-full overflow-hidden">
+                            <div className={`progress-fill h-full rounded-full ${progressColor}`} style={{ width: `${budgetUsedPercent}%` }}></div>
+                        </div>
+                        {isMonthlyView && <p className="text-white/40 text-xs mt-2">Safe daily limit: ₹{Math.floor(safeDailyLimit)} • {daysLeft} days left in month</p>}
+                    </div>
+                    
+                    {/* Dashboard Cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                        <div className="glass-card p-5 flex items-center justify-between">
+                            <div><p className="text-white/50 text-sm">Total Spent</p><p className="text-2xl font-bold text-white">₹{totalSpent}</p></div>
+                            <i className="fas fa-rupee-sign text-3xl text-[#00F2FF]/70"></i>
+                        </div>
+                        <div className="glass-card p-5 flex items-center justify-between">
+                            <div><p className="text-white/50 text-sm">Remaining</p><p className={`text-2xl font-bold ${remainingBudget < 0 ? 'text-red-400' : 'text-white'}`}>₹{Math.max(0, remainingBudget)}</p></div>
+                            <i className="fas fa-chart-line text-3xl text-[#00F2FF]/70"></i>
+                        </div>
+                        <div className="glass-card p-5 flex items-center justify-between">
+                            <div><p className="text-white/50 text-sm">Leaky Bucket</p><p className="text-2xl font-bold text-amber-300">{leakyBucketCount}</p><p className="text-[10px] text-cyan-300/70">under ₹50 spends</p></div>
+                            <i className="fas fa-water text-3xl text-cyan-300/60"></i>
+                        </div>
+                    </div>
+                    
+                    {/* Add Expense Form with OCR Button */}
+                    <div className="glass-card p-5 mb-6">
+                        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
+                            <input 
+                                type="text" 
+                                value={description} 
+                                onChange={(e) => setDescription(e.target.value)} 
+                                placeholder="What did you buy? (e.g., Chai, Netflix Plan)" 
+                                className="flex-1 bg-black/30 border border-white/20 rounded-xl px-4 py-3 text-white placeholder:text-white/40 focus:border-[#00F2FF] outline-none" 
+                            />
+                            <input 
+                                type="number" 
+                                value={amount} 
+                                onChange={(e) => setAmount(e.target.value)} 
+                                placeholder="₹ Amount" 
+                                className="w-full sm:w-32 bg-black/30 border border-white/20 rounded-xl px-4 py-3 text-white outline-none" 
+                            />
+                            <button 
+                                type="submit" 
+                                className="bg-[#00F2FF] text-black font-bold px-6 py-3 rounded-xl flex items-center gap-2 justify-center hover:bg-cyan-300 transition-all"
+                            >
+                                <i className="fas fa-plus"></i> Track
+                            </button>
+                            <button 
+                                type="button" 
+                                onClick={handleOCRScan} 
+                                disabled={isScanning}
+                                className="bg-white/10 border border-[#00F2FF]/40 text-cyan-300 font-bold px-6 py-3 rounded-xl flex items-center gap-2 justify-center hover:bg-white/20 transition-all disabled:opacity-50"
+                            >
+                                {isScanning ? (
+                                    <><i className="fas fa-spinner animate-spin-slow"></i> Scanning...</>
+                                ) : (
+                                    <><i className="fas fa-camera"></i> OCR Snap</>
+                                )}
+                            </button>
+                        </form>
+                        <div className="mt-4 flex items-center gap-3 flex-wrap pt-2 border-t border-white/10">
+                            <label className="text-white/50 text-sm"><i className="fas fa-edit"></i> {isMonthlyView ? 'Monthly Budget:' : 'Daily Budget:'}</label>
+                            <input 
+                                type="number" 
+                                value={isMonthlyView ? monthlyBudget : dailyBudget} 
+                                onChange={(e) => {
+                                    let val = parseInt(e.target.value);
+                                    if (isNaN(val)) val = isMonthlyView ? 5000 : 500;
+                                    if (val <= 0) val = isMonthlyView ? 1000 : 100;
+                                    isMonthlyView ? setMonthlyBudget(val) : setDailyBudget(val);
+                                }} 
+                                className="w-28 bg-black/40 rounded-lg px-3 py-1.5 text-white text-sm outline-none" 
+                            />
+                            <span className="text-[11px] text-cyan-300/70"><i className="fas fa-info-circle"></i> Click OCR to scan canteen bills!</span>
+                        </div>
+                    </div>
+                    
+                    {/* Category Chart + AI Buddy */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <div className="glass-card p-5">
+                            <h3 className="text-white font-semibold mb-3 flex items-center gap-2"><i className="fas fa-chart-pie text-[#00F2FF]"></i> Category Spending</h3>
+                            <div className="h-40 flex items-end justify-around gap-2">
+                                {Object.keys(categoryTotals).map(cat => {
+                                    const val = categoryTotals[cat];
+                                    const heightPercent = maxCategoryVal === 0 ? 0 : (val / maxCategoryVal) * 100;
+                                    return (
+                                        <div key={cat} className="flex flex-col items-center w-1/4">
+                                            <div className="text-sm mb-1">{cat === 'Food' ? '🍔' : cat === 'Transport' ? '🚗' : cat === 'Academic' ? '📚' : '🎉'}</div>
+                                            <div className="w-10 bg-white/20 rounded-full h-24 flex items-end overflow-hidden">
+                                                <div className="chart-bar w-full bg-gradient-to-t from-[#00F2FF] to-cyan-300 rounded-full" style={{ height: `${Math.max(4, heightPercent * 0.8)}%` }}></div>
+                                            </div>
+                                            <p className="text-white/60 text-xs mt-1">₹{val}</p>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                        
+                        <div className="glass-card p-5 flex flex-col">
+                            <div className="flex items-center gap-2 border-b border-white/20 pb-2 mb-3">
+                                <i className="fas fa-robot text-[#00F2FF] text-xl"></i>
+                                <h3 className="text-white font-bold">Fin-Buddy Says (Hostel Roommate)</h3>
+                            </div>
+                            <div className="flex-1 flex items-center p-4 min-h-[100px]">
+                                <p className="text-cyan-100 text-base font-medium text-center leading-relaxed">🤖 {feedbackMsg.includes("✨") ? aiMessage : feedbackMsg}</p>
+                            </div>
+                            <div className="text-right text-[10px] text-white/40 mt-2"><i className="fas fa-microphone-alt"></i> Hinglish realness</div>
+                        </div>
+                    </div>
+                    
+                    {/* Transaction History */}
+                    <div className="glass-card p-5">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-white font-semibold flex items-center gap-2"><i className="fas fa-list-ul text-[#00F2FF]"></i> Expense Feed</h3>
+                            <span className="text-white/40 text-xs">{transactions.length} entries</span>
+                        </div>
+                        {transactions.length === 0 ? (
+                            <div className="text-center py-10 text-white/40">
+                                <i className="fas fa-receipt text-4xl opacity-40 mb-2 block"></i>
+                                <p>No expenses yet! Try the <i className="fas fa-camera text-[#00F2FF]"></i> OCR Snap button!</p>
+                            </div>
+                        ) : (
+                            <div className="max-h-64 overflow-y-auto space-y-2">
+                                {transactions.map(tx => (
+                                    <div key={tx.id} className="slide-item bg-white/5 rounded-xl p-3 flex justify-between items-center">
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-2xl">{tx.icon}</span>
+                                            <div>
+                                                <p className="text-white font-medium">{tx.description}</p>
+                                                <p className="text-white/40 text-xs">{tx.category}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-white font-mono">₹{tx.amount}</span>
+                                            <button onClick={() => deleteTransaction(tx.id)} className="text-white/30 hover:text-red-400 transition">
+                                                <i className="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        {leakyBucketCount > 2 && (
+                            <div className="mt-4 text-xs bg-red-500/20 rounded-xl p-2 text-rose-200 text-center">
+                                <i className="fas fa-tint"></i> {leakyBucketCount} small spends leaking your wallet!
+                            </div>
+                        )}
+                    </div>
+                    
+                    <div className="text-center text-white/30 text-xs mt-6 flex justify-center gap-4">
+                        <span><i className="fas fa-camera"></i> OCR Snap-to-Track</span>
+                        <span><i className="fas fa-user-secret"></i> Subscription Spy</span>
+                        <span><i className="fas fa-chart-line"></i> Survival Mode</span>
+                    </div>
+                </div>
+            );
+        };
+
+        // Main App
+        const App = () => {
+            const [screen, setScreen] = React.useState('landing');
+            
+            return (
+                <div className="min-h-screen">
+                    {screen === 'landing' && <LandingScreen onGetStarted={() => setScreen('login')} />}
+                    {screen === 'login' && <LoginScreen onLogin={() => setScreen('dashboard')} />}
+                    {screen === 'dashboard' && <Dashboard />}
+                </div>
             );
         };
         
-        // Render the app
-        ReactDOM.render(React.createElement(FinBuddyApp, null), document.getElementById("root"));
+        ReactDOM.render(<App />, document.getElementById("root"));
     </script>
 </body>
 </html>
